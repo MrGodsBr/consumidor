@@ -63,6 +63,7 @@
       flex: 1;
       flex-direction: column;
       position: relative;
+      overflow: hidden;
     }
 
     .screen.active {
@@ -170,6 +171,7 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid #e0e0e0;
+      flex-shrink: 0;
     }
 
     .nav-group {
@@ -199,14 +201,16 @@
       background-color: #f39c12;
     }
 
-    /* TELA DE ARTIGO */
+    /* TELA DE ARTIGO CORRIGIDA */
     .article-screen {
       background-color: #ffffff;
+      height: 100%;
     }
 
     .article-body {
-      padding: 24px 20px;
+      padding: 24px 20px 50px 20px; /* Margem extra no final para liberar a rolagem completa */
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch; /* Rolagem suave em dispositivos móveis */
       flex: 1;
       color: #111111;
       line-height: 1.6;
@@ -281,6 +285,7 @@
     .results-list {
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .result-item {
@@ -327,6 +332,7 @@
     .fav-list {
       flex: 1;
       overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .fav-item {
@@ -547,6 +553,10 @@
       if (text) {
         document.getElementById("article-title").innerText = `Artigo ${parseInt(artId, 10)}`;
         document.getElementById("article-content").innerHTML = text;
+        
+        // Garante que a tela role de volta ao topo quando mudar de artigo
+        const bodyEl = document.querySelector('.article-body');
+        if (bodyEl) bodyEl.scrollTop = 0;
       } else {
         document.getElementById("article-content").innerHTML = `<p class="empty-msg">Artigo não encontrado no banco local.</p>`;
       }
