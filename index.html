@@ -5,699 +5,1737 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <title>CDC - Código de Defesa do Consumidor</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      -webkit-tap-highlight-color: transparent;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    
+    :root {
+      --bg-primary: #6392b4;
+      --bg-secondary: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #111111;
+      --header-bg: #0d3859;
+      --header-text: #ffffff;
+      --card-bg: #e3e3e3;
+      --border-color: #e0e0e0;
+      --ia-bg: #eef7ff;
+      --ia-border: #0d3859;
+      --shadow: 0 2px 4px rgba(0,0,0,0.15);
+      --success: #27ae60;
+      --danger: #b76263;
+      --warning: #f39c12;
+      --info: #3f90be;
     }
 
-    body {
-      background-color: #6392b4;
+    [data-theme="dark"] {
+      --bg-primary: #1a1a2e;
+      --bg-secondary: #16213e;
+      --text-primary: #e0e0e0;
+      --text-secondary: #ffffff;
+      --header-bg: #0f3460;
+      --header-text: #ffffff;
+      --card-bg: #2a2a4a;
+      --border-color: #3a3a5a;
+      --ia-bg: #1a2a4a;
+      --ia-border: #4a8ab5;
+      --shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+
+    body { 
+      background-color: var(--bg-primary); 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      min-height: 100vh; 
+      color: var(--text-primary); 
+      transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .app-container { 
+      width: 100%; 
+      max-width: 420px; 
+      height: 100vh; 
+      max-height: 920px; 
+      background-color: var(--bg-primary); 
+      display: flex; 
+      flex-direction: column; 
+      position: relative; 
+      overflow: hidden; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3); 
+      transition: background-color 0.3s;
+    }
+    
+    header { 
+      background-color: var(--header-bg); 
+      color: var(--header-text); 
+      padding: 8px 16px; 
+      display: flex; 
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10; 
+      transition: background-color 0.3s;
+    }
+    
+    header .header-left h1 { 
+      font-size: 20px; 
+      font-weight: bold; 
+      color: #6da2c9; 
+    }
+    
+    header .header-left p { 
+      font-size: 11px; 
+      color: var(--header-text); 
+      font-weight: 500; 
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    
+    .header-btn {
+      width: 36px;
+      height: 36px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      position: relative;
+    }
+    
+    .header-btn:active {
+      transform: scale(0.92);
+    }
+    
+    .badge {
+      position: absolute;
+      top: -4px;
+      right: -4px;
+      background: var(--danger);
+      color: white;
+      font-size: 10px;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+    }
+    
+    .badge.show {
+      display: flex;
+    }
+    
+    .screen { 
+      display: none; 
+      flex: 1; 
+      flex-direction: column; 
+      position: relative; 
+      overflow: hidden; 
+    }
+    
+    .screen.active { display: flex; }
+    
+    /* ===== HOME ===== */
+    .home-content { 
+      flex: 1; 
+      padding: 16px 20px; 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between; 
+    }
+    
+    .home-top {
       display: flex;
       justify-content: center;
       align-items: center;
-      min-height: 100vh;
-      color: #333;
+      margin-bottom: 8px;
     }
-
-    .app-container {
+    
+    .display-number { 
+      text-align: center; 
+      font-size: 28px; 
+      font-weight: bold; 
+      color: var(--header-text); 
+      min-height: 36px; 
+      letter-spacing: 2px; 
+      transition: color 0.3s;
+    }
+    
+    .keypad { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 12px; 
+      margin-bottom: 12px; 
+    }
+    
+    .key-btn { 
+      background-color: var(--card-bg); 
+      border: none; 
+      border-radius: 12px; 
+      height: 64px; 
+      font-size: 28px; 
+      font-weight: bold; 
+      color: var(--text-secondary); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      cursor: pointer; 
+      box-shadow: var(--shadow); 
+      transition: transform 0.1s, background-color 0.3s; 
+    }
+    
+    .key-btn:active { transform: scale(0.95); }
+    .key-btn.clear { background-color: var(--danger); color: #fff; font-size: 24px; }
+    .key-btn.enter { background-color: var(--header-bg); color: #fff; font-size: 24px; }
+    
+    .actions-group { 
+      display: flex; 
+      flex-direction: column; 
+      gap: 8px; 
+      margin-bottom: 8px; 
+    }
+    
+    .action-btn { 
+      width: 100%; 
+      background-color: var(--card-bg); 
+      border: none; 
+      border-radius: 10px; 
+      padding: 14px; 
+      font-size: 15px; 
+      font-weight: bold; 
+      color: var(--text-secondary); 
+      cursor: pointer; 
+      box-shadow: var(--shadow); 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      gap: 8px; 
+      transition: transform 0.1s, background-color 0.3s; 
+    }
+    
+    .action-btn:active { transform: scale(0.98); }
+    
+    .actions-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    
+    .action-btn.half {
       width: 100%;
-      max-width: 420px;
-      height: 100vh;
-      max-height: 880px;
-      background-color: #6392b4;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      padding: 14px;
+      font-size: 14px;
+    }
+    
+    .action-btn.fav-btn-home { 
+      background: linear-gradient(135deg, #fdcb6e, #f39c12); 
+      color: #fff;
+    }
+    
+    .action-btn.backup-btn-home { 
+      background: linear-gradient(135deg, #6c5ce7, #a29bfe); 
+      color: #fff;
+    }
+    
+    .footer-version { 
+      text-align: right; 
+      font-size: 10px; 
+      color: rgba(255,255,255,0.6); 
     }
 
-    header {
-      background-color: #0d3859;
-      color: #ffffff;
+    /* ===== NAV BAR ===== */
+    .nav-bar { 
+      background-color: var(--bg-secondary); 
+      padding: 10px 16px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+      border-bottom: 1px solid var(--border-color); 
+      flex-shrink: 0; 
+      transition: background-color 0.3s;
+    }
+    
+    .nav-group { display: flex; gap: 8px; }
+    
+    .icon-btn { 
+      width: 40px; 
+      height: 40px; 
+      background-color: var(--info); 
+      border: none; 
+      border-radius: 10px; 
+      color: #fff; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      cursor: pointer; 
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2); 
+      transition: transform 0.1s, background-color 0.3s; 
+      font-size: 18px;
+    }
+    
+    .icon-btn:active { transform: scale(0.92); }
+    .icon-btn.fav-btn.active { background-color: var(--warning); }
+    .icon-btn.home-btn { background-color: var(--header-bg); }
+
+    /* ===== TELA DO ARTIGO ===== */
+    .article-screen { 
+      background-color: var(--bg-secondary); 
+      height: 100%; 
+      transition: background-color 0.3s;
+    }
+    
+    .article-body { 
+      padding: 20px 16px 30px 16px; 
+      overflow-y: auto; 
+      -webkit-overflow-scrolling: touch; 
+      flex: 1; 
+      color: var(--text-secondary); 
+      line-height: 1.6; 
+      transition: color 0.3s;
+    }
+    
+    .article-title { 
+      font-size: 22px; 
+      font-weight: bold; 
+      margin-bottom: 12px; 
+      color: var(--text-secondary); 
+      transition: color 0.3s;
+    }
+    
+    .article-text { 
+      font-size: 14px; 
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+    
+    .article-text strong, .article-text b {
+      color: var(--header-bg);
+    }
+    
+    .progresso-bar {
+      width: 100%;
+      height: 4px;
+      background: var(--border-color);
+      border-radius: 2px;
+      margin: 12px 0;
+      overflow: hidden;
+    }
+    
+    .progresso-bar-fill {
+      height: 100%;
+      background: var(--info);
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    
+    .share-btn {
+      background-color: #25D366;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s;
+    }
+    
+    .share-btn:active { transform: scale(0.95); }
+    
+    .article-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .btn-anotar {
+      flex: 1;
+      padding: 10px;
+      background: var(--info);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    
+    .btn-anotar:active { transform: scale(0.98); }
+    
+    .anotacao-container {
+      margin-top: 16px;
+      padding: 14px;
+      background: var(--card-bg);
+      border-radius: 8px;
+    }
+    
+    .anotacao-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .anotacao-texto {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+    
+    .anotacao-data {
+      font-size: 11px;
+      color: #888;
+      margin-top: 4px;
+    }
+
+    /* ===== ARTIGOS RELACIONADOS (NOVA MENTORIA) ===== */
+    .artigos-relacionados-box {
+      margin-top: 16px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    
+    .artigos-relacionados-header {
+      background: linear-gradient(135deg, var(--header-bg), var(--info));
       padding: 12px 16px;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
-      z-index: 10;
+      align-items: center;
+      gap: 10px;
+      color: #fff;
     }
-
-    header h1 {
-      font-size: 22px;
+    
+    .artigos-relacionados-header .icon {
+      font-size: 20px;
+    }
+    
+    .artigos-relacionados-header .title {
       font-weight: bold;
-      color: #6da2c9;
-      margin-bottom: 2px;
+      font-size: 15px;
     }
-
-    header p {
-      font-size: 13px;
-      color: #ffffff;
-      font-weight: 500;
-    }
-
-    .screen {
-      display: none;
-      flex: 1;
-      flex-direction: column;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .screen.active {
-      display: flex;
-    }
-
-    /* TELA INICIAL */
-    .home-content {
-      flex: 1;
-      padding: 20px 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .display-number {
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      color: #ffffff;
-      min-height: 36px;
-      margin-bottom: 10px;
-      letter-spacing: 2px;
-    }
-
-    .keypad {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 15px;
-    }
-
-    .key-btn {
-      background-color: #e3e3e3;
-      border: none;
+    
+    .artigos-relacionados-header .count {
+      margin-left: auto;
+      font-size: 12px;
+      background: rgba(255,255,255,0.2);
+      padding: 2px 10px;
       border-radius: 12px;
-      height: 72px;
-      font-size: 32px;
-      font-weight: bold;
-      color: #000000;
+    }
+    
+    .artigo-relacionado-item {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: background-color 0.2s;
       display: flex;
       align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-      transition: background-color 0.1s, transform 0.05s;
-    }
-
-    .key-btn:active {
-      transform: scale(0.97);
-      background-color: #d0d0d0;
-    }
-
-    .key-btn.clear {
-      background-color: #b76263;
-      color: #ffffff;
-      font-size: 26px;
-    }
-
-    .key-btn.enter {
-      background-color: #0d3859;
-      color: #ffffff;
-      font-size: 28px;
-    }
-
-    .actions-group {
-      display: flex;
-      flex-direction: column;
       gap: 10px;
+    }
+    
+    .artigo-relacionado-item:last-child {
+      border-bottom: none;
+    }
+    
+    .artigo-relacionado-item:active {
+      background-color: var(--card-bg);
+    }
+    
+    .artigo-relacionado-item .num {
+      font-weight: bold;
+      color: var(--info);
+      font-size: 14px;
+      min-width: 30px;
+    }
+    
+    .artigo-relacionado-item .titulo {
+      font-size: 14px;
+      color: var(--text-secondary);
+      flex: 1;
+    }
+    
+    .artigo-relacionado-item .seta {
+      color: var(--info);
+      font-size: 18px;
+    }
+    
+    .artigo-relacionado-item .relacao {
+      font-size: 11px;
+      color: #888;
+      display: block;
+      margin-top: 2px;
+    }
+    
+    .artigos-relacionados-empty {
+      padding: 20px;
+      text-align: center;
+      color: #888;
+      font-size: 13px;
+    }
+
+    /* ===== PESQUISA ===== */
+    .search-screen { 
+      background-color: var(--bg-secondary); 
+      transition: background-color 0.3s;
+    }
+    
+    .search-body { 
+      padding: 16px; 
+      flex: 1; 
+      display: flex; 
+      flex-direction: column; 
+      overflow: hidden; 
+    }
+    
+    .search-title { 
+      font-size: 20px; 
+      font-weight: bold; 
+      color: var(--text-secondary); 
+      margin-bottom: 10px; 
+      transition: color 0.3s;
+    }
+    
+    .search-input-group { 
+      display: flex; 
+      gap: 8px; 
+      margin-bottom: 12px; 
+    }
+    
+    .search-input { 
+      flex: 1; 
+      height: 44px; 
+      border: 1px solid var(--border-color); 
+      border-radius: 8px; 
+      padding: 0 14px; 
+      font-size: 14px; 
+      color: var(--text-secondary); 
+      outline: none; 
+      background-color: var(--bg-secondary);
+      transition: border-color 0.3s;
+    }
+    
+    .search-input:focus { border-color: var(--info); }
+    .search-input::placeholder { color: #999; }
+    
+    .search-submit-btn { 
+      width: 44px; 
+      height: 44px; 
+      background-color: var(--header-bg); 
+      border: none; 
+      border-radius: 8px; 
+      color: #fff; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      cursor: pointer; 
+      transition: transform 0.1s; 
+    }
+    
+    .search-submit-btn:active { transform: scale(0.92); }
+    .results-list { flex: 1; overflow-y: auto; }
+    
+    .section-header {
+      font-size: 12px;
+      font-weight: bold;
+      color: var(--text-secondary);
+      background-color: var(--card-bg);
+      padding: 6px 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      transition: background-color 0.3s;
+    }
+    
+    .section-header.ia {
+      background-color: var(--ia-bg);
+      border-left: 4px solid var(--info);
+    }
+
+    .result-item { 
+      padding: 12px 10px; 
+      border-bottom: 1px solid var(--border-color); 
+      cursor: pointer; 
+      transition: background-color 0.1s; 
+    }
+    
+    .result-item:active { background-color: var(--card-bg); }
+    .result-title { 
+      font-size: 15px; 
+      font-weight: bold; 
+      color: var(--text-secondary); 
+      margin-bottom: 2px; 
+    }
+    
+    .result-snippet { 
+      font-size: 12px; 
+      color: #888; 
+      line-height: 1.4; 
+    }
+
+    .suggestions-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
       margin-bottom: 10px;
     }
-
-    .action-btn {
-      width: 100%;
-      background-color: #e3e3e3;
-      border: none;
-      border-radius: 12px;
-      padding: 16px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #000000;
+    
+    .suggestion-chip {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 4px 12px;
+      font-size: 12px;
       cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      color: var(--text-secondary);
+      transition: all 0.2s;
+    }
+    
+    .suggestion-chip:active {
+      transform: scale(0.95);
+      background: var(--ia-bg);
+    }
+
+    /* ===== FAVORITOS ===== */
+    .favorites-screen { 
+      background-color: var(--bg-secondary); 
+      transition: background-color 0.3s;
+    }
+    
+    .fav-header { 
+      padding: 12px 16px; 
+      border-bottom: 1px solid var(--border-color); 
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between; 
+    }
+    
+    .fav-header h2 { 
+      font-size: 18px; 
+      color: var(--text-secondary); 
+    }
+    
+    .fav-list { flex: 1; overflow-y: auto; }
+    
+    .fav-item { 
+      padding: 12px 16px; 
+      border-bottom: 1px solid var(--border-color); 
+      cursor: pointer; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center; 
+    }
+    
+    .fav-item:active { background-color: var(--card-bg); }
+
+    /* ===== BACKUP ===== */
+    .backup-screen {
+      background-color: var(--bg-secondary);
+    }
+    
+    .backup-container {
+      padding: 16px;
+      flex: 1;
+      overflow-y: auto;
+    }
+    
+    .backup-container h2 {
+      font-size: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    
+    .stat-card {
+      background: var(--card-bg);
+      padding: 14px;
+      border-radius: 12px;
+      text-align: center;
+      transition: transform 0.2s;
+    }
+    
+    .stat-card:active { transform: scale(0.95); }
+    
+    .stat-icon { font-size: 22px; display: block; margin-bottom: 2px; }
+    .stat-number { font-size: 22px; font-weight: bold; display: block; color: var(--text-secondary); }
+    .stat-label { font-size: 11px; color: #888; }
+    
+    .backup-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    
+    .backup-btn {
+      padding: 12px 16px;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.1s;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
     }
+    
+    .backup-btn:active { transform: scale(0.95); }
+    .backup-btn.export-btn { background: var(--success); color: #fff; }
+    .backup-btn.backup-btn-action { background: var(--info); color: #fff; }
+    .backup-btn.restore-btn { background: var(--warning); color: #fff; }
 
-    .action-btn:active {
-      background-color: #d0d0d0;
+    /* ===== NOTIFICAÇÕES ===== */
+    .notificacoes-screen {
+      background-color: var(--bg-secondary);
     }
-
-    .footer-version {
-      text-align: right;
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    /* BARRA DE NAVEGAÇÃO */
-    .nav-bar {
-      background-color: #f5f5f7;
-      padding: 12px 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #e0e0e0;
-      flex-shrink: 0;
-    }
-
-    .nav-group {
-      display: flex;
-      gap: 12px;
-    }
-
-    .icon-btn {
-      width: 44px;
-      height: 44px;
-      background-color: #3f90be;
-      border: none;
-      border-radius: 10px;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-    }
-
-    .icon-btn:active {
-      opacity: 0.8;
-    }
-
-    .icon-btn.fav-btn.active {
-      background-color: #f39c12;
-    }
-
-    /* TELA DE ARTIGO CORRIGIDA */
-    .article-screen {
-      background-color: #ffffff;
-      height: 100%;
-    }
-
-    .article-body {
-      padding: 24px 20px 50px 20px; /* Margem extra no final para liberar a rolagem completa */
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch; /* Rolagem suave em dispositivos móveis */
-      flex: 1;
-      color: #111111;
-      line-height: 1.6;
-    }
-
-    .article-title {
-      font-size: 26px;
-      font-weight: bold;
-      margin-bottom: 20px;
-      color: #000000;
-    }
-
-    .article-text p {
-      margin-bottom: 12px;
-      font-size: 15px;
-    }
-
-    /* TELA DE PESQUISA POR PALAVRA */
-    .search-screen {
-      background-color: #ffffff;
-    }
-
-    .search-body {
-      padding: 20px;
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-
-    .search-title {
-      font-size: 22px;
-      font-weight: bold;
-      color: #000000;
-      margin-bottom: 12px;
-    }
-
-    .search-input-group {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-
-    .search-input {
-      flex: 1;
-      height: 52px;
-      border: 1px solid #333333;
-      border-radius: 8px;
-      padding: 0 16px;
-      font-size: 16px;
-      color: #333333;
-      outline: none;
-    }
-
-    .search-input::placeholder {
-      color: #bbbbbb;
-    }
-
-    .search-submit-btn {
-      width: 52px;
-      height: 52px;
-      background-color: #0d3859;
-      border: none;
-      border-radius: 8px;
-      color: #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-    }
-
-    .results-list {
+    
+    .notificacoes-container {
+      padding: 16px;
       flex: 1;
       overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
     }
-
-    .result-item {
-      padding: 14px 12px;
-      border-bottom: 1px solid #f0f0f0;
-      cursor: pointer;
-    }
-
-    .result-item:hover, .result-item:active {
-      background-color: #f8f9fa;
-    }
-
-    .result-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: #0d3859;
-      margin-bottom: 4px;
-    }
-
-    .result-snippet {
-      font-size: 13px;
-      color: #555555;
-      line-height: 1.4;
-    }
-
-    /* TELA DE FAVORITOS */
-    .favorites-screen {
-      background-color: #ffffff;
-    }
-
-    .fav-header {
-      padding: 16px 20px;
-      border-bottom: 1px solid #eee;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .fav-header h2 {
+    
+    .notificacoes-container h2 {
       font-size: 20px;
-      color: #0d3859;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
     }
-
-    .fav-list {
-      flex: 1;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .fav-item {
-      padding: 16px 20px;
-      border-bottom: 1px solid #f0f0f0;
+    
+    .notificacao-item {
+      padding: 12px;
+      background: var(--card-bg);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      border-left: 4px solid var(--info);
       cursor: pointer;
+    }
+    
+    .notificacao-item.lida { opacity: 0.6; }
+    .notificacao-item .notificacao-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-
-    .empty-msg {
-      text-align: center;
+    
+    .notificacao-item .notificacao-titulo {
+      font-weight: bold;
+      color: var(--text-secondary);
+    }
+    
+    .notificacao-item .notificacao-tipo {
+      font-size: 10px;
+      padding: 2px 8px;
+      border-radius: 10px;
+      text-transform: uppercase;
+    }
+    
+    .notificacao-item .notificacao-tipo.info { background: var(--ia-bg); color: var(--info); }
+    .notificacao-item .notificacao-tipo.warning { background: #fff3cd; color: #856404; }
+    .notificacao-item .notificacao-tipo.success { background: #d4edda; color: #155724; }
+    .notificacao-item .notificacao-tipo.error { background: #f8d7da; color: #721c24; }
+    
+    .notificacao-item .notificacao-mensagem {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    .notificacao-item .notificacao-data {
+      font-size: 10px;
       color: #888;
-      margin-top: 40px;
-      font-size: 15px;
+      margin-top: 4px;
     }
 
-    .loading-spinner {
-      text-align: center;
-      color: #0d3859;
-      padding: 30px;
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .modal-overlay.show { display: flex; }
+    
+    .modal-content {
+      background: var(--bg-secondary);
+      max-width: 380px;
+      width: 90%;
+      max-height: 90vh;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+    
+    .modal-header {
+      padding: 14px 18px;
+      background: var(--header-bg);
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .modal-header h3 { font-size: 16px; }
+    .modal-close { background: none; border: none; color: #fff; font-size: 22px; cursor: pointer; }
+    
+    .modal-body { padding: 18px; max-height: 70vh; overflow-y: auto; }
+    .modal-body textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; min-height: 120px; background: var(--bg-secondary); color: var(--text-secondary); }
+    .modal-body textarea:focus { border-color: var(--info); outline: none; }
+    
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    
+    .modal-actions button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      flex: 1;
+    }
+    
+    .modal-actions .btn-salvar { background: var(--success); color: #fff; }
+    .modal-actions .btn-cancelar { background: var(--danger); color: #fff; }
+    .modal-actions button:active { transform: scale(0.95); }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: var(--header-bg);
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
       font-weight: 500;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 99999;
+      opacity: 0;
+      transition: opacity 0.3s;
+      max-width: 90%;
+      text-align: center;
     }
+    
+    .toast.show { opacity: 1; }
 
-    .icon {
-      width: 22px;
-      height: 22px;
-      fill: currentColor;
+    .empty-msg { text-align: center; color: #888; padding: 20px 0; font-size: 14px; }
+    .loading-spinner { text-align: center; color: var(--text-secondary); padding: 15px; font-weight: 500; font-size: 13px; }
+    .error-message { background: #fee; border-left: 4px solid var(--danger); padding: 10px; border-radius: 8px; color: var(--danger); margin: 6px 0; font-size: 13px; }
+    .icon { width: 20px; height: 20px; fill: currentColor; }
+    .icon-btn .icon { width: 22px; height: 22px; }
+
+    /* Scrollbar */
+    .article-body::-webkit-scrollbar, .results-list::-webkit-scrollbar, .fav-list::-webkit-scrollbar,
+    .backup-container::-webkit-scrollbar, .notificacoes-container::-webkit-scrollbar {
+      width: 3px;
+    }
+    .article-body::-webkit-scrollbar-thumb, .results-list::-webkit-scrollbar-thumb,
+    .fav-list::-webkit-scrollbar-thumb, .backup-container::-webkit-scrollbar-thumb,
+    .notificacoes-container::-webkit-scrollbar-thumb {
+      background: var(--header-bg);
+      border-radius: 2px;
+    }
+    .article-body::-webkit-scrollbar-track, .results-list::-webkit-scrollbar-track,
+    .fav-list::-webkit-scrollbar-track, .backup-container::-webkit-scrollbar-track,
+    .notificacoes-container::-webkit-scrollbar-track {
+      background: transparent;
     }
   </style>
 </head>
 <body>
 
-  <div class="app-container">
-    <header>
+<div class="app-container" id="app">
+  <div id="toast" class="toast"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
       <h1>CDC</h1>
       <p>Código de Defesa do Consumidor</p>
-    </header>
+    </div>
+    <div class="header-actions">
+      <button class="header-btn" onclick="toggleTheme()" id="theme-btn-header">🌓</button>
+      <button class="header-btn notif-btn" onclick="abrirNotificacoes()" id="notif-btn">
+        🔔
+        <span class="badge" id="notificacao-badge">0</span>
+      </button>
+    </div>
+  </header>
 
-    <!-- 1. TELA INICIAL (TECLADO) -->
-    <div id="home-screen" class="screen active">
-      <div class="home-content">
+  <!-- HOME -->
+  <div id="home-screen" class="screen active">
+    <div class="home-content">
+      <div class="home-top">
         <div id="display" class="display-number"></div>
-
-        <div class="keypad">
-          <button class="key-btn" onclick="pressNum('1')">1</button>
-          <button class="key-btn" onclick="pressNum('2')">2</button>
-          <button class="key-btn" onclick="pressNum('3')">3</button>
-          <button class="key-btn" onclick="pressNum('4')">4</button>
-          <button class="key-btn" onclick="pressNum('5')">5</button>
-          <button class="key-btn" onclick="pressNum('6')">6</button>
-          <button class="key-btn" onclick="pressNum('7')">7</button>
-          <button class="key-btn" onclick="pressNum('8')">8</button>
-          <button class="key-btn" onclick="pressNum('9')">9</button>
-          <button class="key-btn clear" onclick="clearNum()">✕</button>
-          <button class="key-btn" onclick="pressNum('0')">0</button>
-          <button class="key-btn enter" onclick="searchArticleFromKeypad()">→</button>
-        </div>
-
-        <div class="actions-group">
-          <button class="action-btn" onclick="openSearchScreen()">
-            Pesquisar por palavra
-          </button>
-          <button class="action-btn" style="background-color: #d1e4f0; color: #0d3859;" onclick="openFavorites()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-            Ver Artigos Favoritados
-          </button>
-        </div>
-
-        <div class="footer-version">1.55.82</div>
       </div>
-    </div>
 
-    <!-- 2. TELA DE PESQUISA POR PALAVRA -->
-    <div id="search-screen" class="screen search-screen">
-      <div class="nav-bar">
-        <button class="icon-btn" onclick="showHome()" title="Início">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-        </button>
+      <div class="keypad">
+        <button class="key-btn" onclick="pressNum('1')">1</button>
+        <button class="key-btn" onclick="pressNum('2')">2</button>
+        <button class="key-btn" onclick="pressNum('3')">3</button>
+        <button class="key-btn" onclick="pressNum('4')">4</button>
+        <button class="key-btn" onclick="pressNum('5')">5</button>
+        <button class="key-btn" onclick="pressNum('6')">6</button>
+        <button class="key-btn" onclick="pressNum('7')">7</button>
+        <button class="key-btn" onclick="pressNum('8')">8</button>
+        <button class="key-btn" onclick="pressNum('9')">9</button>
+        <button class="key-btn clear" onclick="clearNum()">✕</button>
+        <button class="key-btn" onclick="pressNum('0')">0</button>
+        <button class="key-btn enter" onclick="searchArticleFromKeypad()">→</button>
       </div>
-      <div class="search-body">
-        <h2 class="search-title">Pesquisar</h2>
-        <div class="search-input-group">
-          <input type="text" id="search-term-input" class="search-input" placeholder="digite o termo" onkeyup="if(event.key === 'Enter') performTextSearch()" />
-          <button class="search-submit-btn" onclick="performTextSearch()">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
-          </button>
-        </div>
-        <div id="search-results-container" class="results-list"></div>
-      </div>
-    </div>
 
-    <!-- 3. TELA DO ARTIGO -->
-    <div id="article-screen" class="screen article-screen">
-      <div class="nav-bar">
-        <div class="nav-group">
-          <button class="icon-btn" onclick="showHome()" title="Início">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <div class="actions-group">
+        <button class="action-btn" onclick="openSearchScreen()">🔍 Pesquisar CDC</button>
+        <div class="actions-row">
+          <button class="action-btn half fav-btn-home" onclick="openFavorites()">
+            ⭐ Favoritos
           </button>
-          <button class="icon-btn" onclick="openSearchScreen()" title="Pesquisar">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          </button>
-          <button id="fav-toggle-btn" class="icon-btn fav-btn" onclick="toggleFavorite()" title="Favoritar">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          </button>
-        </div>
-        <div class="nav-group">
-          <button class="icon-btn" onclick="navArticle(-1)" title="Anterior">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
-          </button>
-          <button class="icon-btn" onclick="navArticle(1)" title="Próximo">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg>
+          <button class="action-btn half backup-btn-home" onclick="abrirBackup()">
+            💾 Backup
           </button>
         </div>
       </div>
 
-      <div class="article-body">
-        <h2 id="article-title" class="article-title"></h2>
-        <div id="article-content" class="article-text"></div>
-      </div>
-    </div>
-
-    <!-- 4. TELA DE FAVORITOS -->
-    <div id="favorites-screen" class="screen favorites-screen">
-      <div class="fav-header">
-        <h2>Artigos Favoritados</h2>
-        <button class="icon-btn" onclick="showHome()">
-          <svg class="icon" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-        </button>
-      </div>
-      <div id="fav-list-container" class="fav-list"></div>
+      <div class="footer-version">v11.0 Profissional 🌎</div>
     </div>
   </div>
 
-  <script>
-    let currentInput = "";
-    let currentArticleId = null;
-    let cdcDatabase = null;
-    let favorites = JSON.parse(localStorage.getItem('cdc_favorites')) || [];
+  <!-- SEARCH -->
+  <div id="search-screen" class="screen search-screen">
+    <div class="nav-bar">
+      <div class="nav-group">
+        <button class="icon-btn home-btn" onclick="showHome()">🏠</button>
+      </div>
+    </div>
+    <div class="search-body">
+      <h2 class="search-title">🔍 Pesquisar CDC</h2>
+      <div id="suggestions-container" class="suggestions-container"></div>
+      <div class="search-input-group">
+        <input type="text" id="search-term-input" class="search-input" placeholder="Digite sua dúvida..." onkeyup="if(event.key === 'Enter') performTextSearch()" />
+        <button class="search-submit-btn" onclick="performTextSearch()">🔍</button>
+      </div>
+      <div id="search-results-container" class="results-list"></div>
+    </div>
+  </div>
 
-    // --- CARREGAMENTO DO BANCO LOCAL ---
-    async function getDatabase() {
-      if (cdcDatabase) return cdcDatabase;
-      try {
-        const response = await fetch('cdc.json', { cache: 'no-store' });
-        if (!response.ok) throw new Error('Não foi possível carregar cdc.json');
-        cdcDatabase = await response.json();
-        return cdcDatabase;
-      } catch (err) {
-        console.error("Erro ao ler cdc.json:", err);
-        return null;
-      }
-    }
-
-    function getArticleTextFromData(db, artId) {
-      if (!db) return null;
-      const num = parseInt(artId, 10);
+  <!-- ARTICLE -->
+  <div id="article-screen" class="screen article-screen">
+    <div class="nav-bar">
+      <div class="nav-group">
+        <button class="icon-btn home-btn" onclick="showHome()">🏠</button>
+        <button class="icon-btn" onclick="openSearchScreen()">🔍</button>
+        <button id="fav-toggle-btn" class="icon-btn fav-btn" onclick="toggleFavorite()">⭐</button>
+      </div>
+      <div class="nav-group">
+        <button class="icon-btn" onclick="navArticle(-1)">◀</button>
+        <button class="icon-btn" onclick="navArticle(1)">▶</button>
+      </div>
+    </div>
+    <div class="article-body" id="article-body">
+      <h2 id="article-title" class="article-title"></h2>
+      <div class="progresso-bar"><div class="progresso-bar-fill" id="progresso-leitura"></div></div>
+      <div id="article-content" class="article-text"></div>
       
-      // Suporta Array [{ id: 1, texto: "..." }]
-      if (Array.isArray(db)) {
-        const item = db.find(a => parseInt(a.id || a.numero, 10) === num);
-        return item ? (item.texto || item.conteudo) : null;
-      }
-      // Suporta Objeto { "1": "..." }
-      if (typeof db === 'object') {
-        return db[String(num)] || db[num] || null;
-      }
-      return null;
-    }
-
-    // --- TECLADO NUMÉRICO ---
-    function pressNum(num) {
-      if (currentInput.length < 3) {
-        currentInput += num;
-        updateDisplay();
-      }
-    }
-
-    function clearNum() {
-      currentInput = "";
-      updateDisplay();
-    }
-
-    function updateDisplay() {
-      document.getElementById("display").innerText = currentInput;
-    }
-
-    // --- NAVEGAÇÃO DE TELAS ---
-    function switchScreen(screenId) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(screenId).classList.add('active');
-    }
-
-    function showHome() {
-      clearNum();
-      switchScreen('home-screen');
-    }
-
-    function searchArticleFromKeypad() {
-      if (!currentInput) return;
-      const artId = parseInt(currentInput, 10).toString();
-      fetchAndDisplayArticle(artId);
-    }
-
-    // --- COMUNICAÇÃO COM O BANCO DE DADOS LOCAL (CDC.JSON) ---
-    async function fetchAndDisplayArticle(artId) {
-      currentArticleId = artId;
-      switchScreen('article-screen');
-      updateFavButtonState();
-
-      document.getElementById("article-title").innerText = `Artigo ${artId}`;
-      document.getElementById("article-content").innerHTML = `<div class="loading-spinner">Buscando legislação...</div>`;
-
-      const db = await getDatabase();
-      const text = getArticleTextFromData(db, artId);
-
-      if (text) {
-        document.getElementById("article-title").innerText = `Artigo ${parseInt(artId, 10)}`;
-        document.getElementById("article-content").innerHTML = text;
-        
-        // Garante que a tela role de volta ao topo quando mudar de artigo
-        const bodyEl = document.querySelector('.article-body');
-        if (bodyEl) bodyEl.scrollTop = 0;
-      } else {
-        document.getElementById("article-content").innerHTML = `<p class="empty-msg">Artigo não encontrado no banco local.</p>`;
-      }
-    }
-
-    // --- PESQUISA POR PALAVRA ---
-    function openSearchScreen() {
-      document.getElementById("search-term-input").value = "";
-      document.getElementById("search-results-container").innerHTML = "";
-      switchScreen('search-screen');
-    }
-
-    async function performTextSearch() {
-      const term = document.getElementById("search-term-input").value.trim().toLowerCase();
-      const container = document.getElementById("search-results-container");
+      <div class="article-actions">
+        <button class="share-btn" onclick="shareArticle()">📤 Compartilhar</button>
+        <button class="btn-anotar" onclick="abrirEditorAnotacao()">📝 Anotar</button>
+      </div>
       
-      if (!term) return;
-      container.innerHTML = '<div class="loading-spinner">Consultando o CDC...</div>';
+      <div id="anotacao-container"></div>
+      <div id="artigos-relacionados-container"></div>
+    </div>
+  </div>
 
-      const db = await getDatabase();
-      if (!db) {
-        container.innerHTML = '<div class="empty-msg">Erro ao acessar banco local.</div>';
-        return;
+  <!-- FAVORITES -->
+  <div id="favorites-screen" class="screen favorites-screen">
+    <div class="fav-header">
+      <h2>⭐ Favoritos</h2>
+      <div class="nav-group">
+        <button class="icon-btn home-btn" onclick="showHome()">🏠</button>
+      </div>
+    </div>
+    <div id="fav-list-container" class="fav-list"></div>
+  </div>
+
+  <!-- BACKUP -->
+  <div id="backup-screen" class="screen backup-screen">
+    <div class="nav-bar">
+      <div class="nav-group">
+        <button class="icon-btn home-btn" onclick="showHome()">🏠</button>
+      </div>
+    </div>
+    <div class="backup-container" id="backup-container">
+      <h2>💾 Backup</h2>
+      <div id="backup-content"></div>
+    </div>
+  </div>
+
+  <!-- NOTIFICAÇÕES -->
+  <div id="notificacoes-screen" class="screen notificacoes-screen">
+    <div class="nav-bar">
+      <div class="nav-group">
+        <button class="icon-btn home-btn" onclick="showHome()">🏠</button>
+      </div>
+      <button class="icon-btn" onclick="marcarTodasLidas()" style="background: var(--success);">✅</button>
+    </div>
+    <div class="notificacoes-container" id="notificacoes-container">
+      <h2>🔔 Notificações</h2>
+      <div id="notificacoes-list"></div>
+    </div>
+  </div>
+
+  <!-- MODAL ANOTAÇÃO -->
+  <div id="modal-anotacao" class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>📝 Anotações</h3>
+        <button class="modal-close" onclick="fecharModalAnotacao()">✕</button>
+      </div>
+      <div class="modal-body">
+        <textarea id="anotacao-texto" placeholder="Escreva suas anotações sobre este artigo..."></textarea>
+        <input type="hidden" id="anotacao-artigo-id" />
+        <div class="modal-actions">
+          <button class="btn-salvar" onclick="salvarAnotacaoModal()">💾 Salvar</button>
+          <button class="btn-cancelar" onclick="fecharModalAnotacao()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+//  CONFIGURAÇÕES INICIAIS
+// ============================================================
+let currentInput = "";
+let currentArticleId = null;
+let cdcDatabase = null;
+let favorites = JSON.parse(localStorage.getItem('cdc_favorites')) || [];
+let searchHistory = JSON.parse(localStorage.getItem('search_history')) || [];
+let currentTheme = localStorage.getItem('theme') || 'light';
+let anotacoes = JSON.parse(localStorage.getItem('cdc_anotacoes')) || {};
+let notificacoes = JSON.parse(localStorage.getItem('cdc_notificacoes')) || [];
+let estatisticas = JSON.parse(localStorage.getItem('cdc_estatisticas')) || {
+  artigosLidos: [],
+  pesquisas: [],
+  favoritos: 0,
+  ultimoAcesso: null,
+  totalArtigosLidos: 0,
+  artigosMaisPesquisados: {},
+  tempoUso: 0
+};
+let progressoLeitura = JSON.parse(localStorage.getItem('cdc_progresso')) || {};
+let historicoConversa = [];
+
+const API_BASE_URL = '/api';
+
+// ============================================================
+//  TEMA - APENAS NO HEADER
+// ============================================================
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const btn = document.getElementById('theme-btn-header');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌓';
+}
+
+function toggleTheme() {
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  applyTheme(newTheme);
+  showToast(newTheme === 'dark' ? '🌙 Tema escuro' : '☀️ Tema claro');
+}
+
+// ============================================================
+//  TOAST
+// ============================================================
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.backgroundColor = isError ? '#b76263' : 'var(--header-bg)';
+  toast.classList.add('show');
+  clearTimeout(toast._timeout);
+  toast._timeout = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+// ============================================================
+//  NAVEGAÇÃO
+// ============================================================
+function switchScreen(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+}
+
+function showHome() { clearNum(); switchScreen('home-screen'); }
+
+function pressNum(num) { if (currentInput.length < 3) { currentInput += num; updateDisplay(); } }
+function clearNum() { currentInput = ""; updateDisplay(); }
+function updateDisplay() { document.getElementById("display").innerText = currentInput; }
+
+// ============================================================
+//  DATABASE
+// ============================================================
+async function getDatabase() {
+  if (cdcDatabase) return cdcDatabase;
+  try {
+    const response = await fetch('cdc.json');
+    if (!response.ok) throw new Error('Erro ao carregar cdc.json');
+    cdcDatabase = await response.json();
+    return cdcDatabase;
+  } catch (err) {
+    console.error(err);
+    return null;
+  }
+}
+
+function getArticleFromData(db, artId) {
+  if (!db) return null;
+  const num = parseInt(artId, 10);
+  if (Array.isArray(db)) {
+    return db.find(a => parseInt(a.id || a.numero, 10) === num) || null;
+  }
+  return null;
+}
+
+function searchArticleFromKeypad() {
+  if (!currentInput) return;
+  fetchAndDisplayArticle(parseInt(currentInput, 10).toString());
+}
+
+// ============================================================
+//  ESTATÍSTICAS
+// ============================================================
+function registrarLeitura(artigoId) {
+  if (!estatisticas.artigosLidos) estatisticas.artigosLidos = [];
+  estatisticas.artigosLidos.push({ id: artigoId, data: new Date().toISOString() });
+  estatisticas.totalArtigosLidos = estatisticas.artigosLidos.length;
+  estatisticas.ultimoAcesso = new Date().toISOString();
+  estatisticas.artigosMaisPesquisados[artigoId] = (estatisticas.artigosMaisPesquisados[artigoId] || 0) + 1;
+  localStorage.setItem('cdc_estatisticas', JSON.stringify(estatisticas));
+}
+
+function registrarPesquisa(termo) {
+  if (!estatisticas.pesquisas) estatisticas.pesquisas = [];
+  estatisticas.pesquisas.push({ termo: termo, data: new Date().toISOString() });
+  localStorage.setItem('cdc_estatisticas', JSON.stringify(estatisticas));
+}
+
+function calcularTempoUso() {
+  const totalMs = (estatisticas.artigosLidos?.length || 0) * 120000;
+  const minutos = Math.floor(totalMs / 60000);
+  if (minutos < 60) return `${minutos}min`;
+  return `${Math.floor(minutos / 60)}h ${minutos % 60}min`;
+}
+
+// ============================================================
+//  NOTIFICAÇÕES
+// ============================================================
+function adicionarNotificacao(titulo, mensagem, tipo = 'info') {
+  const notif = {
+    id: Date.now(),
+    titulo,
+    mensagem,
+    tipo,
+    lida: false,
+    data: new Date().toISOString()
+  };
+  notificacoes.unshift(notif);
+  if (notificacoes.length > 50) notificacoes.pop();
+  localStorage.setItem('cdc_notificacoes', JSON.stringify(notificacoes));
+  atualizarBadge();
+}
+
+function atualizarBadge() {
+  const naoLidas = notificacoes.filter(n => !n.lida).length;
+  const badge = document.getElementById('notificacao-badge');
+  if (badge) {
+    badge.textContent = naoLidas;
+    badge.classList.toggle('show', naoLidas > 0);
+  }
+}
+
+function marcarTodasLidas() {
+  notificacoes.forEach(n => n.lida = true);
+  localStorage.setItem('cdc_notificacoes', JSON.stringify(notificacoes));
+  atualizarBadge();
+  abrirNotificacoes();
+  showToast('✅ Todas lidas');
+}
+
+function agendarNotificacoes() {
+  const direitos = [
+    { titulo: '💡 Direito à Informação', msg: 'O CDC garante informações claras sobre produtos e serviços.' },
+    { titulo: '📌 Direito de Arrependimento', msg: 'Você tem 7 dias para desistir de compras online.' },
+    { titulo: '⚠️ Produtos com Defeito', msg: 'Fornecedor tem 30 dias para resolver problemas.' }
+  ];
+  const ultima = localStorage.getItem('ultima_notificacao_direito');
+  const agora = Date.now();
+  if (!ultima || (agora - parseInt(ultima)) > 3 * 24 * 60 * 60 * 1000) {
+    const d = direitos[Math.floor(Math.random() * direitos.length)];
+    adicionarNotificacao(d.titulo, d.msg, 'info');
+    localStorage.setItem('ultima_notificacao_direito', agora.toString());
+  }
+}
+
+function abrirNotificacoes() {
+  switchScreen('notificacoes-screen');
+  const container = document.getElementById('notificacoes-list');
+  if (notificacoes.length === 0) {
+    container.innerHTML = '<div class="empty-msg">Nenhuma notificação</div>';
+    return;
+  }
+  container.innerHTML = notificacoes.map(n => `
+    <div class="notificacao-item ${n.lida ? 'lida' : ''}" onclick="marcarNotificacaoLida(${n.id})">
+      <div class="notificacao-header">
+        <span class="notificacao-titulo">${n.titulo}</span>
+        <span class="notificacao-tipo ${n.tipo}">${n.tipo}</span>
+      </div>
+      <div class="notificacao-mensagem">${n.mensagem}</div>
+      <div class="notificacao-data">${new Date(n.data).toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+function marcarNotificacaoLida(id) {
+  const n = notificacoes.find(item => item.id === id);
+  if (n) { n.lida = true; localStorage.setItem('cdc_notificacoes', JSON.stringify(notificacoes)); atualizarBadge(); abrirNotificacoes(); }
+}
+
+// ============================================================
+//  ARTIGOS RELACIONADOS (NOVA FUNÇÃO)
+// ============================================================
+function encontrarArtigosRelacionados(db, artigoId, maxResults = 5) {
+  if (!db || !artigoId) return [];
+  
+  const artigoAtual = getArticleFromData(db, artigoId);
+  if (!artigoAtual) return [];
+  
+  const numAtual = parseInt(artigoId, 10);
+  const relacionados = [];
+  
+  // Função para extrair palavras-chave do texto
+  function extrairPalavrasChave(texto) {
+    const palavras = texto.toLowerCase()
+      .replace(/[^\w\s]/g, '')
+      .split(/\s+/)
+      .filter(p => p.length > 3);
+    
+    // Palavras comuns do CDC que são importantes
+    const palavrasImportantes = ['consumidor', 'fornecedor', 'produto', 'serviço', 'direito', 
+      'garantia', 'responsabilidade', 'prazo', 'defeito', 'vício', 'reparação', 'indenização',
+      'contrato', 'cláusula', 'publicidade', 'engano', 'informação', 'qualidade', 'segurança',
+      'solidariedade', 'decadência', 'prescrição', 'ônus', 'prova', 'sanção', 'multa'];
+    
+    // Pega palavras que são importantes
+    const chaves = palavras.filter(p => palavrasImportantes.some(imp => p.includes(imp)));
+    return [...new Set(chaves)];
+  }
+  
+  const palavrasChave = extrairPalavrasChave(artigoAtual.texto + ' ' + (artigoAtual.titulo || ''));
+  
+  // Busca artigos relacionados
+  db.forEach(art => {
+    const id = parseInt(art.id || art.numero, 10);
+    if (id === numAtual) return;
+    
+    const textoCompleto = (art.texto + ' ' + (art.titulo || '')).toLowerCase();
+    let score = 0;
+    let palavrasEncontradas = [];
+    
+    // Verifica cada palavra-chave
+    palavrasChave.forEach(palavra => {
+      if (textoCompleto.includes(palavra)) {
+        score++;
+        palavrasEncontradas.push(palavra);
       }
+    });
+    
+    // Verifica se o artigo é numericamente próximo (artigos sequenciais)
+    const diff = Math.abs(id - numAtual);
+    if (diff <= 10) {
+      score += 0.5;
+    }
+    
+    // Se tem relação, adiciona
+    if (score > 0) {
+      relacionados.push({
+        id: id,
+        titulo: art.titulo || `Artigo ${id}`,
+        score: score,
+        palavras: palavrasEncontradas.slice(0, 3)
+      });
+    }
+  });
+  
+  // Ordena por score e limita
+  relacionados.sort((a, b) => b.score - a.score);
+  return relacionados.slice(0, maxResults);
+}
 
-      const resultados = [];
+function renderArtigosRelacionados(relacionados, artigoId) {
+  const container = document.getElementById('artigos-relacionados-container');
+  
+  if (!relacionados || relacionados.length === 0) {
+    container.innerHTML = `
+      <div class="artigos-relacionados-box">
+        <div class="artigos-relacionados-header">
+          <span class="icon">📚</span>
+          <span class="title">Artigos Relacionados</span>
+          <span class="count">0</span>
+        </div>
+        <div class="artigos-relacionados-empty">
+          Nenhum artigo relacionado encontrado para o Artigo ${artigoId}.
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = `
+    <div class="artigos-relacionados-box">
+      <div class="artigos-relacionados-header">
+        <span class="icon">📚</span>
+        <span class="title">Artigos Relacionados</span>
+        <span class="count">${relacionados.length}</span>
+      </div>
+      ${relacionados.map(art => `
+        <div class="artigo-relacionado-item" onclick="fetchAndDisplayArticle('${art.id}')">
+          <span class="num">${art.id}</span>
+          <div>
+            <span class="titulo">${art.titulo}</span>
+            <span class="relacao">${art.palavras.length > 0 ? 'Relacionado por: ' + art.palavras.join(', ') : 'Artigo relacionado'}</span>
+          </div>
+          <span class="seta">›</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
 
-      if (Array.isArray(db)) {
-        db.forEach(item => {
-          const txt = item.texto || item.conteudo || "";
-          const id = item.id || item.numero;
-          if (txt.toLowerCase().includes(term)) {
-            const cleanText = txt.replace(/<[^>]*>?/gm, '');
-            resultados.push({
-              id: String(id),
-              title: `Artigo ${id}`,
-              snippet: cleanText.substring(0, 100) + "..."
-            });
-          }
-        });
-      } else if (typeof db === 'object') {
-        Object.keys(db).forEach(key => {
-          const txt = db[key] || "";
-          if (txt.toLowerCase().includes(term)) {
-            const cleanText = txt.replace(/<[^>]*>?/gm, '');
-            resultados.push({
-              id: String(key),
-              title: `Artigo ${key}`,
-              snippet: cleanText.substring(0, 100) + "..."
-            });
-          }
-        });
-      }
+// ============================================================
+//  ARTIGO
+// ============================================================
+async function fetchAndDisplayArticle(artId, extraIaText = null) {
+  currentArticleId = artId;
+  switchScreen('article-screen');
+  updateFavButtonState();
+  registrarLeitura(artId);
 
-      if (resultados.length === 0) {
-        container.innerHTML = `<div class="empty-msg">Nenhum artigo encontrado para "${term}".</div>`;
-        return;
-      }
+  document.getElementById("article-title").innerText = `Artigo ${artId}`;
+  document.getElementById("article-content").innerHTML = `<div class="loading-spinner">Carregando...</div>`;
+  document.getElementById("progresso-leitura").style.width = '0%';
+  
+  const db = await getDatabase();
+  const articleObj = getArticleFromData(db, artId);
 
-      container.innerHTML = "";
-      resultados.forEach(res => {
+  if (articleObj && articleObj.texto) {
+    document.getElementById("article-title").innerText = articleObj.titulo || `Artigo ${artId}`;
+    document.getElementById("article-content").innerHTML = articleObj.texto;
+
+    const progresso = progressoLeitura[artId]?.progresso || 0;
+    document.getElementById("progresso-leitura").style.width = progresso + '%';
+
+    const anotacao = anotacoes[artId];
+    const anotContainer = document.getElementById('anotacao-container');
+    if (anotacao) {
+      anotContainer.innerHTML = `
+        <div class="anotacao-container">
+          <div class="anotacao-header">
+            <span>📝 Anotações</span>
+            <button onclick="abrirEditorAnotacao()" style="background:none;border:none;font-size:16px;cursor:pointer;">✏️</button>
+          </div>
+          <div class="anotacao-texto">${anotacao.texto}</div>
+          <div class="anotacao-data">${new Date(anotacao.data).toLocaleString()}</div>
+        </div>
+      `;
+    } else {
+      anotContainer.innerHTML = '';
+    }
+
+    // Buscar e mostrar artigos relacionados
+    const relacionados = encontrarArtigosRelacionados(db, artId);
+    renderArtigosRelacionados(relacionados, artId);
+
+    document.getElementById('article-body').scrollTop = 0;
+  } else {
+    document.getElementById("article-content").innerHTML = `<p class="empty-msg">Artigo não encontrado.</p>`;
+  }
+}
+
+function navArticle(direction) {
+  let num = parseInt(currentArticleId, 10);
+  if (isNaN(num)) num = 1;
+  num += direction;
+  if (num < 1) num = 1;
+  if (num > 119) num = 119;
+  fetchAndDisplayArticle(num.toString());
+}
+
+// ============================================================
+//  FAVORITOS
+// ============================================================
+function toggleFavorite() {
+  if (!currentArticleId) return;
+  const index = favorites.indexOf(currentArticleId);
+  if (index === -1) {
+    favorites.push(currentArticleId);
+    showToast('⭐ Favoritado!');
+    estatisticas.favoritos = favorites.length;
+    localStorage.setItem('cdc_estatisticas', JSON.stringify(estatisticas));
+  } else {
+    favorites.splice(index, 1);
+    showToast('💔 Removido');
+  }
+  localStorage.setItem('cdc_favorites', JSON.stringify(favorites));
+  updateFavButtonState();
+  if (document.getElementById('favorites-screen').classList.contains('active')) openFavorites();
+}
+
+function updateFavButtonState() {
+  const btn = document.getElementById("fav-toggle-btn");
+  if (btn) btn.classList.toggle('active', favorites.includes(currentArticleId));
+}
+
+async function openFavorites() {
+  const container = document.getElementById("fav-list-container");
+  container.innerHTML = '';
+  if (favorites.length === 0) {
+    container.innerHTML = '<div class="empty-msg">Nenhum favorito.</div>';
+  } else {
+    const db = await getDatabase();
+    favorites.forEach(id => {
+      const art = getArticleFromData(db, id);
+      const item = document.createElement("div");
+      item.className = "fav-item";
+      item.onclick = () => fetchAndDisplayArticle(id);
+      item.innerHTML = `
+        <div><div style="font-weight:bold;color:var(--text-secondary);">${art?.titulo || 'Artigo '+id}</div><div style="font-size:12px;color:#888;">${art?.texto?.substring(0,60)||''}...</div></div>
+        <span style="color:var(--warning);font-size:18px;">⭐</span>
+      `;
+      container.appendChild(item);
+    });
+  }
+  switchScreen('favorites-screen');
+}
+
+// ============================================================
+//  PESQUISA
+// ============================================================
+function openSearchScreen() {
+  document.getElementById("search-term-input").value = "";
+  document.getElementById("search-results-container").innerHTML = "";
+  renderSuggestions();
+  switchScreen('search-screen');
+}
+
+function renderSuggestions() {
+  const container = document.getElementById('suggestions-container');
+  if (!container) return;
+  if (searchHistory.length === 0) { container.innerHTML = ''; return; }
+  container.innerHTML = searchHistory.map(term => `
+    <span class="suggestion-chip" onclick="useSuggestion('${term.replace(/'/g, "\\'")}')">${term}</span>
+  `).join('');
+}
+
+function useSuggestion(term) {
+  document.getElementById('search-term-input').value = term;
+  performTextSearch();
+}
+
+function saveSearchHistory(term) {
+  if (!term || term.trim() === '') return;
+  const cleaned = term.trim();
+  searchHistory = searchHistory.filter(t => t.toLowerCase() !== cleaned.toLowerCase());
+  searchHistory.unshift(cleaned);
+  if (searchHistory.length > 10) searchHistory.pop();
+  localStorage.setItem('search_history', JSON.stringify(searchHistory));
+  renderSuggestions();
+}
+
+async function performTextSearch() {
+  const term = document.getElementById("search-term-input").value.trim();
+  const container = document.getElementById("search-results-container");
+  if (!term) { container.innerHTML = '<div class="error-message">Digite um termo.</div>'; return; }
+
+  saveSearchHistory(term);
+  registrarPesquisa(term);
+  container.innerHTML = '<div class="loading-spinner">🔍 Buscando...</div>';
+
+  const db = await getDatabase();
+  if (!db) { container.innerHTML = '<div class="error-message">Erro ao carregar base.</div>'; return; }
+  container.innerHTML = "";
+
+  const termLower = term.toLowerCase();
+  const matchesLocal = db.filter(art => (art.titulo + " " + art.texto).toLowerCase().includes(termLower));
+  const localHeader = document.createElement("div");
+  localHeader.className = "section-header";
+  localHeader.innerText = `📄 Local (${matchesLocal.length})`;
+  container.appendChild(localHeader);
+
+  if (matchesLocal.length > 0) {
+    matchesLocal.slice(0, 5).forEach(art => {
+      const item = document.createElement("div");
+      item.className = "result-item";
+      item.onclick = () => fetchAndDisplayArticle(art.id || art.numero);
+      const preview = art.texto.substring(0, 100) + '...';
+      item.innerHTML = `<div class="result-title">${art.titulo||'Artigo '+art.id}</div><div class="result-snippet">${preview}</div>`;
+      container.appendChild(item);
+    });
+  } else {
+    const empty = document.createElement("div");
+    empty.className = "empty-msg";
+    empty.innerText = "Nenhum resultado local.";
+    container.appendChild(empty);
+  }
+
+  const iaHeader = document.createElement("div");
+  iaHeader.className = "section-header ia";
+  iaHeader.innerText = "🌎 Análise IA";
+  container.appendChild(iaHeader);
+
+  const iaLoading = document.createElement("div");
+  iaLoading.className = "loading-spinner";
+  iaLoading.innerText = "Consultando IA...";
+  container.appendChild(iaLoading);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/buscar`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        query: term,
+        contexto: historicoConversa.slice(-3)
+      })
+    });
+    const data = await response.json();
+    if (container.contains(iaLoading)) container.removeChild(iaLoading);
+
+    if (data.resultados && data.resultados.length > 0) {
+      data.resultados.forEach(res => {
         const item = document.createElement("div");
         item.className = "result-item";
         item.onclick = () => fetchAndDisplayArticle(res.id);
-        item.innerHTML = `
-          <div class="result-title">${res.title}</div>
-          <div class="result-snippet">${res.snippet}</div>
-        `;
+        item.innerHTML = `<div class="result-title">📌 Artigo ${res.id} 🌎</div><div class="result-snippet">${res.explicacao_ia||'Toque para abrir'}</div>`;
         container.appendChild(item);
+        historicoConversa.push({ pergunta: term, resposta: res.explicacao_ia });
+        if (historicoConversa.length > 10) historicoConversa.shift();
       });
+    } else {
+      const empty = document.createElement("div");
+      empty.className = "empty-msg";
+      empty.innerText = "Sem análise da IA.";
+      container.appendChild(empty);
     }
+  } catch (err) {
+    if (container.contains(iaLoading)) container.removeChild(iaLoading);
+    const errDiv = document.createElement("div");
+    errDiv.className = "error-message";
+    errDiv.innerText = "❌ Erro na IA.";
+    container.appendChild(errDiv);
+  }
+}
 
-    // --- NAVEGAÇÃO ENTRE ARTIGOS (ANTERIOR / PRÓXIMO) ---
-    function navArticle(direction) {
-      let num = parseInt(currentArticleId, 10);
-      if (isNaN(num)) num = 1;
-      num += direction;
-      if (num < 1) num = 1;
-      if (num > 119) num = 119;
-      fetchAndDisplayArticle(num.toString());
+// ============================================================
+//  COMPARTILHAR
+// ============================================================
+async function shareArticle() {
+  const title = document.getElementById('article-title').innerText || 'Artigo CDC';
+  const url = window.location.href + `?artigo=${currentArticleId}`;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title: `CDC - ${title}`, text: `📜 ${title}`, url });
+      showToast('✅ Compartilhado!');
+    } else {
+      await navigator.clipboard.writeText(url);
+      showToast('📋 Link copiado!');
     }
+  } catch (err) { if (err.name !== 'AbortError') showToast('❌ Erro ao compartilhar', true); }
+}
 
-    // --- GERENCIAMENTO DE FAVORITOS ---
-    function toggleFavorite() {
-      if (!currentArticleId) return;
+// ============================================================
+//  ANOTAÇÕES
+// ============================================================
+function abrirEditorAnotacao() {
+  const modal = document.getElementById('modal-anotacao');
+  document.getElementById('anotacao-artigo-id').value = currentArticleId;
+  document.getElementById('anotacao-texto').value = anotacoes[currentArticleId]?.texto || '';
+  modal.classList.add('show');
+}
 
-      const index = favorites.indexOf(currentArticleId);
-      if (index === -1) {
-        favorites.push(currentArticleId);
-      } else {
-        favorites.splice(index, 1);
-      }
+function fecharModalAnotacao() {
+  document.getElementById('modal-anotacao').classList.remove('show');
+}
 
-      localStorage.setItem('cdc_favorites', JSON.stringify(favorites));
-      updateFavButtonState();
-    }
+function salvarAnotacaoModal() {
+  const artigoId = document.getElementById('anotacao-artigo-id').value;
+  const texto = document.getElementById('anotacao-texto').value.trim();
+  if (texto) {
+    anotacoes[artigoId] = { texto, data: new Date().toISOString() };
+    localStorage.setItem('cdc_anotacoes', JSON.stringify(anotacoes));
+    showToast('✅ Anotação salva!');
+  } else {
+    delete anotacoes[artigoId];
+    localStorage.setItem('cdc_anotacoes', JSON.stringify(anotacoes));
+    showToast('🗑️ Anotação removida');
+  }
+  fecharModalAnotacao();
+  fetchAndDisplayArticle(artigoId);
+}
 
-    function updateFavButtonState() {
-      const btn = document.getElementById("fav-toggle-btn");
-      if (favorites.includes(currentArticleId)) {
-        btn.classList.add("active");
-      } else {
-        btn.classList.remove("active");
-      }
-    }
+// ============================================================
+//  BACKUP
+// ============================================================
+function abrirBackup() {
+  switchScreen('backup-screen');
+  const container = document.getElementById('backup-content');
+  const topArtigos = Object.entries(estatisticas.artigosMaisPesquisados || {})
+    .sort((a, b) => b[1] - a[1]).slice(0, 5);
 
-    async function openFavorites() {
-      const container = document.getElementById("fav-list-container");
-      container.innerHTML = "";
+  container.innerHTML = `
+    <div class="stats-grid">
+      <div class="stat-card"><span class="stat-icon">📖</span><span class="stat-number">${estatisticas.totalArtigosLidos||0}</span><span class="stat-label">Artigos Lidos</span></div>
+      <div class="stat-card"><span class="stat-icon">🔍</span><span class="stat-number">${estatisticas.pesquisas?.length||0}</span><span class="stat-label">Pesquisas</span></div>
+      <div class="stat-card"><span class="stat-icon">⭐</span><span class="stat-number">${favorites.length}</span><span class="stat-label">Favoritos</span></div>
+      <div class="stat-card"><span class="stat-icon">⏱️</span><span class="stat-number">${calcularTempoUso()}</span><span class="stat-label">Tempo de Uso</span></div>
+    </div>
+    <div style="background:var(--card-bg);border-radius:12px;padding:14px;margin-bottom:16px;">
+      <h3 style="font-size:15px;color:var(--text-secondary);margin-bottom:8px;">🏆 Artigos Mais Pesquisados</h3>
+      ${topArtigos.length > 0 ? topArtigos.map(([id, count]) => `
+        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border-color);cursor:pointer;" onclick="fetchAndDisplayArticle('${id}')">
+          <span style="color:var(--text-secondary);">Artigo ${id}</span>
+          <span style="color:#888;font-size:12px;">${count} pesquisas</span>
+        </div>
+      `).join('') : '<div class="empty-msg">Nenhum dado ainda</div>'}
+    </div>
+    <div class="backup-actions">
+      <button class="backup-btn export-btn" onclick="exportarFavoritos()">📤 Exportar Favoritos</button>
+      <button class="backup-btn backup-btn-action" onclick="exportarBackup()">💾 Criar Backup</button>
+      <button class="backup-btn restore-btn" onclick="restaurarBackup()">📂 Restaurar Backup</button>
+    </div>
+  `;
+}
 
-      if (favorites.length === 0) {
-        container.innerHTML = '<div class="empty-msg">Nenhum artigo favoritado ainda.</div>';
-      } else {
-        const db = await getDatabase();
-        favorites.forEach(id => {
-          let title = `Artigo ${id}`;
-          let preview = "Toque para abrir o conteúdo do artigo...";
-          
-          const rawText = getArticleTextFromData(db, id);
-          if (rawText) {
-            const tempDiv = document.createElement("div");
-            tempDiv.innerHTML = rawText;
-            preview = (tempDiv.textContent || tempDiv.innerText || "").substring(0, 80) + "...";
-          }
+function exportarFavoritos() {
+  const db = getDatabase();
+  const arts = favorites.map(id => getArticleFromData(db, id)).filter(Boolean);
+  const html = `<html><head><title>Favoritos CDC</title></head><body>
+    <h1>📚 Meus Favoritos</h1>
+    ${arts.map(a => `<div style="margin:16px 0;border:1px solid #ddd;padding:12px;border-radius:8px;">
+      <h2>${a.titulo}</h2><p>${a.texto.substring(0,300)}...</p>
+      <p><strong>Anotação:</strong> ${anotacoes[a.id]?.texto||'Sem anotação'}</p>
+    </div>`).join('')}
+  </body></html>`;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'favoritos-cdc.html'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Exportado!');
+}
 
-          const item = document.createElement("div");
-          item.className = "fav-item";
-          item.onclick = () => fetchAndDisplayArticle(id);
-          item.innerHTML = `
-            <div>
-              <div style="font-weight: bold; color: #0d3859;">${title}</div>
-              <div style="font-size: 13px; color: #666;">${preview}</div>
-            </div>
-            <svg class="icon" style="color: #f39c12;" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-          `;
-          container.appendChild(item);
-        });
-      }
+function exportarBackup() {
+  const dados = { favoritos, historico: searchHistory, anotacoes, estatisticas, progresso: progressoLeitura, data: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `backup-cdc-${Date.now()}.json`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Backup criado!');
+}
 
-      switchScreen('favorites-screen');
-    }
-  </script>
+function restaurarBackup() {
+  const input = document.createElement('input');
+  input.type = 'file'; input.accept = '.json';
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      try {
+        const dados = JSON.parse(ev.target.result);
+        if (dados.favoritos) localStorage.setItem('cdc_favorites', JSON.stringify(dados.favoritos));
+        if (dados.historico) localStorage.setItem('search_history', JSON.stringify(dados.historico));
+        if (dados.anotacoes) localStorage.setItem('cdc_anotacoes', JSON.stringify(dados.anotacoes));
+        if (dados.estatisticas) localStorage.setItem('cdc_estatisticas', JSON.stringify(dados.estatisticas));
+        if (dados.progresso) localStorage.setItem('cdc_progresso', JSON.stringify(dados.progresso));
+        showToast('✅ Backup restaurado!');
+        setTimeout(() => location.reload(), 1000);
+      } catch (err) { showToast('❌ Arquivo inválido', true); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+// ============================================================
+//  INICIALIZAÇÃO
+// ============================================================
+applyTheme(currentTheme);
+atualizarBadge();
+agendarNotificacoes();
+
+const urlParams = new URLSearchParams(window.location.search);
+const artigoParam = urlParams.get('artigo');
+if (artigoParam) {
+  setTimeout(() => fetchAndDisplayArticle(artigoParam), 500);
+}
+
+// ============================================================
+//  EXPOSIÇÃO GLOBAL
+// ============================================================
+window.pressNum = pressNum;
+window.clearNum = clearNum;
+window.searchArticleFromKeypad = searchArticleFromKeypad;
+window.openSearchScreen = openSearchScreen;
+window.openFavorites = openFavorites;
+window.toggleTheme = toggleTheme;
+window.showHome = showHome;
+window.fetchAndDisplayArticle = fetchAndDisplayArticle;
+window.performTextSearch = performTextSearch;
+window.useSuggestion = useSuggestion;
+window.navArticle = navArticle;
+window.toggleFavorite = toggleFavorite;
+window.shareArticle = shareArticle;
+window.abrirEditorAnotacao = abrirEditorAnotacao;
+window.fecharModalAnotacao = fecharModalAnotacao;
+window.salvarAnotacaoModal = salvarAnotacaoModal;
+window.abrirBackup = abrirBackup;
+window.abrirNotificacoes = abrirNotificacoes;
+window.marcarNotificacaoLida = marcarNotificacaoLida;
+window.marcarTodasLidas = marcarTodasLidas;
+window.exportarFavoritos = exportarFavoritos;
+window.exportarBackup = exportarBackup;
+window.restaurarBackup = restaurarBackup;
+</script>
 </body>
 </html>
